@@ -72,11 +72,17 @@ class GoogleAuthenticator_Plugin implements Typecho_Plugin_Interface
             </p>';
     }
 
-    public static function valid($secret,$oneCode)
+    public static function valid($login)
     {
     	include_once 'GoogleAuthenticator.php';
 	    $ga = new PHPGangsta_GoogleAuthenticator();
-	    return $ga->verifyCode($secret, $oneCode, 2);
+	    if(!$ga->verifyCode($login->user->row['googleCode'], $login->request->verificationCode, 2)){
+            $login->widget('Widget_Notice')->set(_t('验证码无效'), 'error
+');
+            $login->user->logout();
+            $login->response->goBack('?referer=' . urlencode($this->reque
+st->referer));
+        }
     }
 
     public static function createSecret()
@@ -96,5 +102,11 @@ class GoogleAuthenticator_Plugin implements Typecho_Plugin_Interface
 	    include_once 'GoogleAuthenticator.php';
 	    $ga = new PHPGangsta_GoogleAuthenticator();
 	    return $ga->getQRCodeGoogleUrl('Blog', $secret);
+    }
+    
+    public static function validator($validator){
+        $validator->addRule('verificationCode', 'required', _t('请输入验证码'));
+        $validator->addRule('verificationCode', 'isInteger', _t('验证码必须是数>
+字'));
     }
 }
