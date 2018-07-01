@@ -23,6 +23,7 @@ class GoogleAuthenticator_Plugin implements Typecho_Plugin_Interface
         Typecho_Plugin::factory('admin/login.php')->valid = array('GoogleAuthenticator_Plugin', 'valid');
         Typecho_Plugin::factory('admin/login.php')->secret = array('GoogleAuthenticator_Plugin', 'createSecret');
         Typecho_Plugin::factory('admin/login.php')->qrCodeUrl = array('GoogleAuthenticator_Plugin', 'qrCodeUrl');
+        Typecho_Plugin::factory('admin/login.php')->validator = array('GoogleAuthenticator_Plugin', 'validator');
     }
     
     /**
@@ -77,11 +78,9 @@ class GoogleAuthenticator_Plugin implements Typecho_Plugin_Interface
     	include_once 'GoogleAuthenticator.php';
 	    $ga = new PHPGangsta_GoogleAuthenticator();
 	    if(!$ga->verifyCode($login->user->row['googleCode'], $login->request->verificationCode, 2)){
-            $login->widget('Widget_Notice')->set(_t('验证码无效'), 'error
-');
+            $login->widget('Widget_Notice')->set(_t('验证码无效'), 'error');
             $login->user->logout();
-            $login->response->goBack('?referer=' . urlencode($this->reque
-st->referer));
+            $login->response->goBack('?referer=' . urlencode($this->request->referer));
         }
     }
 
@@ -106,7 +105,6 @@ st->referer));
     
     public static function validator($validator){
         $validator->addRule('verificationCode', 'required', _t('请输入验证码'));
-        $validator->addRule('verificationCode', 'isInteger', _t('验证码必须是数>
-字'));
+        $validator->addRule('verificationCode', 'isInteger', _t('验证码必须是数字'));
     }
 }
