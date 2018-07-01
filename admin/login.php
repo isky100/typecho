@@ -23,6 +23,7 @@ include 'header.php';
                 <label for="password" class="sr-only"><?php _e('密码'); ?></label>
                 <input type="password" id="password" name="password" class="text-l w-100" placeholder="<?php _e('密码'); ?>" />
             </p>
+            <?php Typecho_Plugin::factory('admin/login.php')->verificationCode(); ?>
             <p class="submit">
                 <button type="submit" class="btn btn-l w-100 primary"><?php _e('登录'); ?></button>
                 <input type="hidden" name="referer" value="<?php echo htmlspecialchars($request->get('referer')); ?>" />
