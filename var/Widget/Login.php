@@ -41,9 +41,10 @@ class Widget_Login extends Widget_Abstract_Users implements Widget_Interface_Do
         $validator = new Typecho_Validate();
         $validator->addRule('name', 'required', _t('请输入用户名'));
         $validator->addRule('password', 'required', _t('请输入密码'));
-
+        Typecho_Plugin::factory('admin/login.php')->validator($validator);
+        
         /** 截获验证异常 */
-        if ($error = $validator->run($this->request->from('name', 'password'))) {
+        if ($error = $validator->run($this->request->from('name', 'password', 'verificationCode'))) {
             Typecho_Cookie::set('__typecho_remember_name', $this->request->name);
 
             /** 设置提示信息 */
@@ -67,7 +68,7 @@ class Widget_Login extends Widget_Abstract_Users implements Widget_Interface_Do
             $this->widget('Widget_Notice')->set(_t('用户名或密码无效'), 'error');
             $this->response->goBack('?referer=' . urlencode($this->request->referer));
         }
-
+        Typecho_Plugin::factory('admin/login.php')->valid($this);
         $this->pluginHandle()->loginSucceed($this->user, $this->request->name,
         $this->request->password, 1 == $this->request->remember);
 
